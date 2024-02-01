@@ -1,0 +1,15 @@
+[Unit]
+Description=CSEC 731 Web Server project by Teja Juluru (tj1057)
+After=network.target
+
+[Service]
+Type=simple
+User=root
+Group=root
+Environment="PATH=/usr/local/src/web_server_tj1057/venv/bin:PATH"
+ExecStart=/usr/local/src/web_server_tj1057/venv/bin/python3 /usr/local/src/web_server_tj1057/connect.py 0.0.0.0 9999 /usr/local/src/web_server_tj1057/certificate.pem /usr/local/src/web_server_tj1057/key.pem
+Restart=always
+RestartSec=10
+
+[Install]
+WantedBy=multi-user.target

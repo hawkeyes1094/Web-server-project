@@ -1,0 +1,5 @@
+[web_server]
+ansible_managed_host_linode ansible_host=143.42.230.171
+
+[web_server:vars]
+ansible_user=root

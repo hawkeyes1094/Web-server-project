@@ -1,0 +1,68 @@
+---
+- hosts: all
+  become: yes
+  vars:
+    local_code_path: "{{ inventory_dir | dirname }}/Code"
+    web_server_path: "/usr/local/src/web_server_tj1057"
+
+  tasks:
+
+    - name: create a directory for the web server
+      file:
+        path: "{{ web_server_path }}"
+        state: directory
+      become: true
+
+    - name: Copy the web server files
+      copy:
+        src: "{{ local_code_path }}/"
+        dest: "{{ web_server_path }}/"
+
+    - name: Set execute permissions on connect.py
+      file:
+        dest: "{{ web_server_path }}/connect.py"
+        mode: 'a+x'
+
+    - name: Install the php-cgi package
+      apt:
+        name: php-cgi
+        update-cache: yes
+
+    - name: Install the python-venv package
+      apt:
+        name: python3-venv
+        update-cache: yes
+    
+    - name: Create venv
+      command: 
+        cmd: python3 -m venv {{ web_server_path }}/venv
+        creates: "{{ web_server_path }}/venv"
+
+    - name: Allow all access to port 9999
+      ufw:
+        rule: allow
+        port: '9999'
+        proto: tcp
+
+    - name: Install service file
+      copy:
+        src: "{{ local_code_path }}/web_server_tj1057.service"
+        dest: "/etc/systemd/system/web_server_tj1057.service"
+      become: true
+
+    - name: Reload systemd
+      systemd:
+        daemon_reload: yes
+      become: true
+
+    - name: Enable service
+      systemd:
+        name: web_server_tj1057
+        enabled: yes
+      become: true
+
+    - name: Start service
+      systemd:
+        name: web_server_tj1057
+        state: started
+      become: true
